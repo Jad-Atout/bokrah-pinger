@@ -1,0 +1,17 @@
+name: Keep Bokrah Backend Awake
+
+on:
+  schedule:
+    - cron: '*/14 * * * *'  
+  workflow_dispatch:        
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Bokrah backend
+        env:
+          URL: ${{ secrets.RENDER_PING_URL }}
+        run: |
+          echo "Pinging $URL at $(date -u)"
+          curl -fsSL "$URL" || echo "Ping failed"
