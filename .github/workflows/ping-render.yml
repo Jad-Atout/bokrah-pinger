@@ -2,7 +2,7 @@ name: Keep Bokrah Backend Awake
 
 on:
   schedule:
-    - cron: '*/14 * * * *'  
+    - cron: '*/7 * * * *'  
   workflow_dispatch:        
 
 jobs:
