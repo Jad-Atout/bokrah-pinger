@@ -2,8 +2,13 @@ name: Keep Bokrah Backend Awake
 
 on:
   schedule:
-    - cron: '*/7 * * * *'  
-  workflow_dispatch:        
+    - cron: '*/5 * * * *'       # Primary ping every 5 minutes
+    - cron: '13/15 * * * *'     # Offset ping every 15 minutes starting at minute 13
+  workflow_dispatch:            # Allow manual triggering
+
+concurrency:
+  group: keep-bokrah-awake
+  cancel-in-progress: true      # Cancel previous run if new one starts
 
 jobs:
   ping:
@@ -13,5 +18,15 @@ jobs:
         env:
           URL: ${{ secrets.RENDER_PING_URL }}
         run: |
+          echo "::group::Ping"
           echo "Pinging $URL at $(date -u)"
-          curl -fsSL "$URL" || echo "Ping failed"
+          for i in {1..3}; do
+            if curl -fsSL "$URL"; then
+              echo "Ping succeeded"
+              break
+            else
+              echo "Retry $i failed – sleeping 5s"
+              sleep 5
+            fi
+          done || echo "Ping failed after 3 attempts"
+          echo "::endgroup::"
